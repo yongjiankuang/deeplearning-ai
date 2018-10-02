@@ -65,10 +65,10 @@ def initialize_parameters(n_x,n_h,n_y):
     """
     np.random.seed(2)
     
-    W1 = np.randm.randn(n_h,n_x) * 0.01
-    b1 = np.zeros(n_h,1)
+    W1 = np.random.randn(n_h,n_x) * 0.01
+    b1 = np.zeros((n_h,1))
     W2 = np.random.randn(n_y,n_h) * 0.01
-    b2 = np.zeros(n_y,1)
+    b2 = np.zeros((n_y,1))
     
     #check
     assert(W1.shape == (n_h,n_x))
@@ -99,8 +99,10 @@ def forward_propagation(X,parameters):
     W2 = parameters["W2"]
     b2 = parameters["b2"]
     
+   # print('X.shape = ',X.shape)
+    
     Z1 = np.dot(W1,X) + b1
-    A1 = sigmoid(Z1)
+    A1 = np.tanh(Z1)
     Z2 = np.dot(W2,A1) + b2
     A2 = sigmoid(Z2)
     
@@ -152,8 +154,8 @@ def backward_propagation(parameters,cache,X,Y):
     W1 = parameters["W1"]
     W2 = parameters["W2"]
     
-    A1 = parameters["A1"]
-    A2 = parameters["A2"]
+    A1 = cache["A1"]
+    A2 = cache["A2"]
     
     dZ2 = A2 - Y
     dW2 = np.dot(dZ2,A1.T) / m
@@ -185,10 +187,10 @@ def update_parameters(parameters,grads,learning_rate = 1.2):
     W2 = parameters["W2"]
     b2 = parameters["b2"]
     
-    dW1 = grads["W1"]
-    db1 = grads["b1"]
-    dW2 = grads["W2"]
-    db2 = grads["b2"]
+    dW1 = grads["dW1"]
+    db1 = grads["db1"]
+    dW2 = grads["dW2"]
+    db2 = grads["db2"]
     
     #update
     W1 = W1 - learning_rate * dW1
@@ -218,6 +220,12 @@ def nn_model(X,Y,n_h,num_iterations = 10000,print_cost = False):
     np.random.seed(3)
     n_x = layer_sizes(X,Y)[0]
     n_y = layer_sizes(X,Y)[2]
+    
+    print('X.shape = ',X.shape)
+    print('n_x = ',n_x)
+    print('n_h = ',n_h)
+    print('n_y = ',n_y)
+    
 
     parameters = initialize_parameters(n_x,n_h,n_y)  
     W1 = parameters["W1"]
@@ -266,12 +274,24 @@ def ex_2():
     for i,n_h in enumerate(hidden_layer_sizes):
         plt.subplot(5,2,i + 1)
         plt.title('Hidden Layer of size %d'%n_h)
-        parameters = 
+        parameters = nn_model(X,Y,n_h = 4,num_iterations = 10000,print_cost = True)
+        
+        #plot the descision boundary
+        plot_decision_boundary(lambda x: predict(parameters,X),X,Y)
+        plt.title("Decision Boundary for hidden layer size " + str(4))
+
+def ex_3():  
+    parameters = nn_model(X,Y,n_h = 4,num_iterations = 10000,print_cost = True)
+    predictions = predict(parameters, X)
+    print ('Accuracy: %d' % float((np.dot(Y,predictions.T) +
+        np.dot(1-Y,1-predictions.T))/float(Y.size)*100) + '%')        
+    
 
 
 if __name__ == '__main__':
-    ex_1()    
-
+    #ex_1()    
+    #ex_2()
+    ex_3()
    
     
 
